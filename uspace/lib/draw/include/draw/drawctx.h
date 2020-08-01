@@ -77,6 +77,7 @@ extern void drawctx_transfer(drawctx_t *, sysarg_t, sysarg_t, sysarg_t, sysarg_t
 extern void drawctx_stroke(drawctx_t *, path_t *);
 extern void drawctx_fill(drawctx_t *, path_t *);
 extern void drawctx_print(drawctx_t *, const char *, sysarg_t, sysarg_t);
+extern void drawctx_lineto(drawctx_t *, sysarg_t, sysarg_t, sysarg_t, sysarg_t);
 
 #endif
 

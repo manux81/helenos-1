@@ -177,6 +177,8 @@ void drawctx_transfer(drawctx_t *context,
 
 void drawctx_stroke(drawctx_t *context, path_t *path)
 {
+	double _x = 0.0;
+	double _y = 0.0;
 	if (!context->source || !path) {
 		return;
 	}
@@ -191,15 +193,15 @@ void drawctx_stroke(drawctx_t *context, path_t *path)
 
 	list_foreach(*((list_t *) path), link, path_step_t, step) {
 		switch (step->type) {
-		case PATH_STEP_MOVETO:
-			// TODO
-			break;
 		case PATH_STEP_LINETO:
-			// TODO
+			drawctx_lineto(context, _x, _y, step->to_x, step->to_y);
 			break;
+		case PATH_STEP_MOVETO:
 		default:
 			break;
 		}
+		_x =  step->to_x;
+		_y =  step->to_y;
 	}
 }
 
@@ -216,6 +218,23 @@ void drawctx_print(drawctx_t *context, const char *text, sysarg_t x, sysarg_t y)
 {
 	if (context->font && context->source) {
 		font_draw_text(context->font, context, context->source, text, x, y);
+	}
+}
+
+void drawctx_lineto(drawctx_t *context, sysarg_t xs, sysarg_t ys, sysarg_t xe, sysarg_t ye)
+{
+	if (! context->source)
+		return;
+
+	pixel_t pixel = context->source->color;
+	int dx = abs(xe - xs), sx = xs < xe ? 1 : -1;
+	int dy = abs(ye - ys), sy = ys < ye ? 1 : -1;
+	int err = (dx > dy ? dx : -dy) / 2;
+
+	while (surface_put_pixel(context->surface, xs, ys, pixel), xs != xe || ys != ye) {
+		int e2 = err;
+		if (e2 > -dx) { err -= dy; xs += sx; }
+		if (e2 <  dy) { err += dx; ys += sy; }
 	}
 }
 
